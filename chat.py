@@ -38,10 +38,9 @@ class DeleteUser(Resource):
 
             print("data", data)
 
-            if (len(data) > 0):
+            if len(data) is not 0:
                 return {'status': 200, 'Message': 'User supprimé', 'UserId': str(data[0][0]),
                         'UserName': str(data[0][1]), 'UserStatus': str(data[0][2])}
-                # return {'status': 200, 'message': 'User supprimé'}
             else:
                 return {'status': 1000, 'Message': 'Echec authentification'}
 
@@ -69,7 +68,7 @@ class AuthenticateUser(Resource):
 
             print("data", data)
 
-            if (len(data) > 0):
+            if len(data) is not 0:
                 return {'status': 200, 'UserId': str(data[0][0]), 'UserName': str(data[0][1])}
             else:
                 return {'status': 1000, 'Message': 'Echec authentification'}
@@ -95,17 +94,22 @@ class GetUser(Resource):
 
             print("data", data)
 
-            items_list = []
-            for item in data:
-                i = {
-                    'UserId': item[0],
-                    'UserName': item[1],
-                    'UserEmail': item[2]
+            if len(data) is not 0:
 
-                }
-                items_list.append(i)
+                items_list = []
+                for item in data:
+                    i = {
+                        'UserId': item[0],
+                        'UserName': item[1],
+                        'UserEmail': item[2]
 
-            return {'StatusCode': 200, 'User': items_list}
+                    }
+                    items_list.append(i)
+
+                return {'StatusCode': 200, 'User': items_list}
+            else:
+
+                return {'status': 1000, 'Message': 'UserId inconnu'}
 
         except Exception as e:
             return {'error': str(e)}
@@ -129,16 +133,22 @@ class GetAllUsers(Resource):
             print("data", data)
 
             items_list = []
-            for item in data:
-                i = {
-                    'UserId': item[0],
-                    'UserName': item[1],
-                    'UserEmail': item[2]
 
-                }
-                items_list.append(i)
+            if len(data) is not 0:
 
-            return {'StatusCode': 200, 'Users': items_list}
+                for item in data:
+                    i = {
+                        'UserId': item[0],
+                        'UserName': item[1],
+                        'UserEmail': item[2]
+                    }
+                    items_list.append(i)
+
+                return {'StatusCode': 200, 'Users': items_list}
+
+            else:
+
+                return {'status': 1000, 'Message': 'Aucun user trouvé'}
 
         except Exception as e:
             return {'error': str(e)}
@@ -169,7 +179,6 @@ class PostMessage(Resource):
             else:
                 return {'StatusCode': 1000, 'Message': str(data[0])}
 
-
         except Exception as e:
             return {'error': str(e)}
 
@@ -191,15 +200,19 @@ class GetLastTenMessages(Resource):
 
             print("data", data)
 
-            items_list = []
-            for item in data:
-                i = {
-                    'UserId': item[0],
-                    'MsgBody': item[1]
-                }
-                items_list.append(i)
+            if len(data) is not 0:
 
-            return {'StatusCode': 200, 'TenLastMessages': items_list}
+                items_list = []
+                for item in data:
+                    i = {
+                        'userName': item[0],
+                        'MsgBody': item[1]
+                    }
+                    items_list.append(i)
+
+                return {'StatusCode': 200, 'TenLastMessages': items_list}
+            else:
+                return {'StatusCode': 1000, 'Message': 'Aucun message trouvé'}
 
         except Exception as e:
             return {'error': str(e)}
@@ -259,7 +272,7 @@ class UpdateUser(Resource):
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.callproc('spUpdateUser', (
-            _userId, _userName, _userPassword, _userEmail, _userNameNew, _userPasswordNew, _userEmailNew))
+                _userId, _userName, _userPassword, _userEmail, _userNameNew, _userPasswordNew, _userEmailNew))
             data = cursor.fetchall()
 
             print('UpdateUser data', data)
