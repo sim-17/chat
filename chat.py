@@ -33,7 +33,7 @@ class DeleteUser(Resource):
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spDeleteUser', (_userName, _userPassword))
+            cursor.callproc('spDeleteUser', (_userName, _userPassword,))
             data = cursor.fetchall()
 
             print("data", data)
@@ -63,7 +63,7 @@ class AuthenticateUser(Resource):
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spAuthenticateUser', (_userName, _userPassword))
+            cursor.callproc('spAuthenticateUser', (_userName, _userPassword,))
             data = cursor.fetchall()
 
             print("data", data)
@@ -82,14 +82,14 @@ class GetUser(Resource):
         try:
             # Parse the arguments
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str)
+            parser.add_argument('user_id', type=int, required=True)
             args = parser.parse_args()
 
             _userId = args['user_id']
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spGetUser', _userId)
+            cursor.callproc('spGetUser', (_userId,))
             data = cursor.fetchall()
 
             print("data", data)
@@ -120,14 +120,14 @@ class GetAllUsers(Resource):
         try:
             # Parse the arguments
             parser = reqparse.RequestParser()
-            parser.add_argument('user_status', type=str, required=True, default='1')
+            parser.add_argument('user_status', type=int, required=True, default='1')
             args = parser.parse_args()
 
             _userStatus = args['user_status']
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spGetAllUsers', _userStatus)
+            cursor.callproc('spGetAllUsers', (_userStatus,))
             data = cursor.fetchall()
 
             print("data", data)
@@ -159,7 +159,7 @@ class PostMessage(Resource):
         try:
             # Parse the arguments
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str)
+            parser.add_argument('user_id', type=int)
             parser.add_argument('msg_body', type=str)
             args = parser.parse_args()
 
@@ -168,7 +168,7 @@ class PostMessage(Resource):
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spPostMessage', (_userId, _msgBody))
+            cursor.callproc('spPostMessage', (_userId, _msgBody,))
             data = cursor.fetchall()
 
             print('PostMessage', data)
@@ -188,14 +188,16 @@ class GetLastTenMessages(Resource):
         try:
             # Parse the arguments
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str, required=True)
+            parser.add_argument('user_id', type=int)
             args = parser.parse_args()
 
             _userId = args['user_id']
 
+            print('_userId', _userId)
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spGetLastTenMessages', _userId)
+            cursor.callproc('spGetLastTenMessages', (_userId,))
+
             data = cursor.fetchall()
 
             print("data", data)
@@ -212,7 +214,7 @@ class GetLastTenMessages(Resource):
 
                 return {'StatusCode': 200, 'TenLastMessages': items_list}
             else:
-                return {'StatusCode': 1000, 'Message': 'Aucun message trouvé'}
+                return {'StatusCode': 1000, 'Message': 'user invalide ou aucun message trouvé'}
 
         except Exception as e:
             return {'error': str(e)}
@@ -234,7 +236,7 @@ class CreateUser(Resource):
 
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.callproc('spCreateUser', (_userName, _userPassword, _userEmail))
+            cursor.callproc('spCreateUser', (_userName, _userPassword, _userEmail,))
             data = cursor.fetchall()
 
             if len(data) is 0:
@@ -252,7 +254,7 @@ class UpdateUser(Resource):
         try:
             # Parse the arguments
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str, help='user id', required=False, default='0')
+            parser.add_argument('user_id', type=int, help='user id', required=False, default='0')
             parser.add_argument('user_name', type=str, help='user name')
             parser.add_argument('user_name_new', type=str, help='new user name', required=False, default='0')
             parser.add_argument('user_pwd', type=str, help='user password')
@@ -272,7 +274,7 @@ class UpdateUser(Resource):
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.callproc('spUpdateUser', (
-                _userId, _userName, _userPassword, _userEmail, _userNameNew, _userPasswordNew, _userEmailNew))
+                _userId, _userName, _userPassword, _userEmail, _userNameNew, _userPasswordNew, _userEmailNew,))
             data = cursor.fetchall()
 
             print('UpdateUser data', data)
